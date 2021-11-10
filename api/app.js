@@ -13,7 +13,7 @@ var coursesIdRouter = require('./routes/courses/_id');
 var coursesDeleteRouter = require('./routes/courses/_delete');
 var coursesModifyRouter = require('./routes/courses/_modify');
 var coursesCreateRouter = require('./routes/courses/create');
-var uploadRouter = require('./routes/upload');
+var uploadRouter = require('./routes/uploads/create');
 
 var app = express();
 

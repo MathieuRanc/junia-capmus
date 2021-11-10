@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const mysql = require('mysql');
 
 router.post('/', (req, res, next) => {
 	try {
@@ -30,6 +31,18 @@ router.post('/', (req, res, next) => {
 
 const upload = multer({ dest: './.tmp/' });
 
+const postUpload = (data) => {
+	var connection = mysql.createConnection({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USERNAME,
+		password: process.env.DB_PASSWORD,
+		database: process.env.DB_NAME,
+	});
+	connection.connect();
+	connection.query('INSERT INTO uploads (name, url) VALUES (?, ?);', [data.name, data.url], (err) => (err ? console.log(false) : console.log(true)));
+	connection.end();
+};
+
 router.post('/', upload.single('file'), (req, res) => {
 	if (!req.file.path) res.status(422).json({ message: 'Image not sended' });
 	const tempPath = req.file.path;
@@ -40,8 +53,9 @@ router.post('/', upload.single('file'), (req, res) => {
 	if (['.pdf'].includes(path.extname(req.file.originalname).toLowerCase())) {
 		fs.rename(tempPath, targetPath, (err) => {
 			if (err) return res.status(500).json({ message: 'Oops! Something went wrong!' });
-
-			res.status(200).json({ message: 'File uploaded!', url: req.protocol + '://' + req.get('host') + '/uploads/' + name });
+			const url = req.protocol + '://' + req.get('host') + '/uploads/' + name;
+			postUpload({ name, url });
+			res.status(200).json({ message: 'File uploaded!', url });
 		});
 	} else {
 		fs.unlink(tempPath, (err) => {

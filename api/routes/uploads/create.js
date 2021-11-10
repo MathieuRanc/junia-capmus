@@ -39,7 +39,9 @@ const postUpload = (data) => {
 		database: process.env.DB_NAME,
 	});
 	connection.connect();
-	connection.query('INSERT INTO uploads (name, url) VALUES (?, ?);', [data.name, data.url], (err) => (err ? console.log(false) : console.log(true)));
+	connection.query('INSERT INTO uploads (name, url) VALUES (?, ?);', [data.name, data.url], (error) => {
+		if (error) console.log(error);
+	});
 	connection.end();
 };
 
@@ -48,7 +50,7 @@ router.post('/', upload.single('file'), (req, res) => {
 	const tempPath = req.file.path;
 	const id = fs.readdirSync('./public/uploads/').length;
 	const name = id + '_' + req.file.originalname;
-	const targetPath = path.join(__dirname, '../public/uploads/' + name);
+	const targetPath = path.join(__dirname, '../../public/uploads/' + name);
 
 	if (['.pdf'].includes(path.extname(req.file.originalname).toLowerCase())) {
 		fs.rename(tempPath, targetPath, (err) => {

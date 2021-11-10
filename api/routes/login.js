@@ -13,13 +13,14 @@ router.post('/', (req, res, next) => {
 	});
 
 	connection.connect();
-	connection.query('SELECT id,password,roles FROM users WHERE username=?', [req.body.username], async (err, result) => {
+	connection.query('SELECT id,password,roles,confirmed FROM users WHERE username=?', [req.body.username], async (err, result) => {
 		if (result && result.length === 1) {
 			const user = result[0];
 			validPassword = await bcrypt.compare(req.body.password, user.password);
 			if (validPassword) {
-				const access_token = jwt.sign({ id: user.id, username: req.body.username, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '365d' });
-
+				const access_token = jwt.sign({ id: user.id, username: req.body.username, roles: user.roles, confirmed: user.confirmed }, process.env.JWT_SECRET, {
+					expiresIn: '365d',
+				});
 				jwt.verify(access_token, process.env.JWT_SECRET, (err, user) => {
 					if (err) {
 						return res.sendStatus(403);

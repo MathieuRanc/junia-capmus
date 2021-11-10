@@ -28,3 +28,6 @@ benchmarks/graphs
 # Private
 .env
 .tmp
+
+# Local uploads
+uploads/*

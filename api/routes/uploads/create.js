@@ -14,7 +14,7 @@ router.post('/', (req, res, next) => {
 			const token = authHeader.split(' ')[1];
 
 			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-				if (err || !JSON.parse(user.roles).includes('ROLE_MEMBER')) {
+				if (err || !JSON.parse(user.roles).includes('ROLE_MEMBER') || user.confirmed !== 1) {
 					return res.status(403).json({ message: 'forbidden' });
 				} else {
 					req.user = user;

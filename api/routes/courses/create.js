@@ -26,8 +26,8 @@ router.post('/', function (req, res, next) {
 			res.status(401).send('undefined jwt token');
 		}
 	} catch (err) {
-	console.log('authenticated');
-  res.status(500).send({ error: err.message });
+		console.log('authenticated');
+		res.status(500).send({ error: err.message });
 	}
 });
 

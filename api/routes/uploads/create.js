@@ -31,7 +31,7 @@ router.post('/', (req, res, next) => {
 
 const upload = multer({ dest: './.tmp/' });
 
-const postUpload = (data) => {
+const postUpload = (data, req) => {
 	var connection = mysql.createConnection({
 		host: process.env.DB_HOST,
 		user: process.env.DB_USERNAME,
@@ -39,7 +39,7 @@ const postUpload = (data) => {
 		database: process.env.DB_NAME,
 	});
 	connection.connect();
-	connection.query('INSERT INTO uploads (name, url) VALUES (?, ?);', [data.name, data.url], (error) => {
+	connection.query('INSERT INTO uploads (name, url, owner) VALUES (?, ?, ?);', [data.name, data.url, req.user.id], (error) => {
 		if (error) console.log(error);
 	});
 	connection.end();
@@ -56,7 +56,7 @@ router.post('/', upload.single('file'), (req, res) => {
 		fs.rename(tempPath, targetPath, (err) => {
 			if (err) return res.status(500).json({ message: 'Oops! Something went wrong!' });
 			const url = req.protocol + '://' + req.get('host') + '/uploads/' + name;
-			postUpload({ name, url });
+			postUpload({ name, url }, req);
 			res.status(200).json({ message: 'File uploaded!', url });
 		});
 	} else {

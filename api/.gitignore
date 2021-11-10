@@ -30,4 +30,4 @@ benchmarks/graphs
 .tmp
 
 # Local uploads
-uploads/*
+public/uploads/*

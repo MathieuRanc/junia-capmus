@@ -41,7 +41,7 @@ router.patch('/:id', function (req, res) {
 
 	connection.connect();
 	connection.query(
-		'UPDATE courses SET name=?, year=?, school=?, subject=?, difficulty=?, type=?, content=? WHERE id=? AND creator=?;',
+		'UPDATE courses SET name=?, year=?, school=?, subject=?, difficulty=?, type=?, content=? WHERE id=? AND owner=?;',
 		[req.body.name, req.body.year, req.body.school, req.body.subject, req.body.difficulty, req.body.type, req.body.content, req.params.id, req.user.id],
 		(err) => {
 			if (err) res.json({ err });

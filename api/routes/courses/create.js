@@ -42,7 +42,7 @@ router.post('/', function (req, res) {
 	function getCourseId(data, callback) {
 		connection.connect();
 		connection.query(
-			'INSERT INTO courses (name, year, school, subject, difficulty, type, content, creator) VALUES (?, ?, ?, ?, ?, ?, ?, ?);',
+			'INSERT INTO courses (name, year, school, subject, difficulty, type, content, owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?);',
 			[req.body.name, req.body.year, req.body.school, req.body.subject, req.body.difficulty, req.body.type, req.body.content, req.user.id],
 			(err, course) => {
 				if (course) {

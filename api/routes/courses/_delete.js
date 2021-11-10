@@ -14,7 +14,7 @@ router.delete('/:id', function (req, res, next) {
 			!req.body.difficulty ||
 			!req.body.type ||
 			!req.body.content ||
-			!req.body.creator
+			!req.body.owner
 		) {
 			throw Error('Missing params');
 		}
@@ -66,7 +66,7 @@ router.delete('/:id', function (req, res) {
 
 	// console.log(req.user);
 
-	connection.query('DELETE FROM courses WHERE id=? AND creator=?;', [req.params.id, req.user.id], (err, result) => {
+	connection.query('DELETE FROM courses WHERE id=? AND owner=?;', [req.params.id, req.user.id], (err, result) => {
 		if (result) {
 			res.json({ course });
 		} else res.json({ err });

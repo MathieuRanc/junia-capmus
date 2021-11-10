@@ -13,6 +13,7 @@ var coursesIdRouter = require('./routes/courses/_id');
 var coursesDeleteRouter = require('./routes/courses/_delete');
 var coursesModifyRouter = require('./routes/courses/_modify');
 var coursesCreateRouter = require('./routes/courses/create');
+var uploadRouter = require('./routes/upload');
 
 var app = express();
 
@@ -34,6 +35,7 @@ app.use('/courses', coursesIdRouter);
 app.use('/courses', coursesDeleteRouter);
 app.use('/courses', coursesModifyRouter);
 app.use('/courses', coursesCreateRouter);
+app.use('/upload', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

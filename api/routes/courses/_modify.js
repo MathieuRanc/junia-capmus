@@ -4,7 +4,7 @@ var mysql = require('mysql');
 const jwt = require('jsonwebtoken');
 
 /* GET users listing. */
-router.patch('/:id', function (req, res, next) {
+router.put('/:id', function (req, res, next) {
 	try {
 		if (!req.body.name || !req.body.year || !req.body.school || !req.body.subject || !req.body.difficulty || !req.body.type || !req.body.content) {
 			throw Error('Missing params');
@@ -31,7 +31,7 @@ router.patch('/:id', function (req, res, next) {
 	}
 });
 
-router.patch('/:id', function (req, res) {
+router.put('/:id', function (req, res) {
 	var connection = mysql.createConnection({
 		host: process.env.DB_HOST,
 		user: process.env.DB_USERNAME,

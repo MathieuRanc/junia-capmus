@@ -3,20 +3,6 @@ var router = express.Router();
 var mysql = require('mysql');
 const jwt = require('jsonwebtoken');
 
-function escapeHtml(text) {
-	var map = {
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		'"': '&quot;',
-		"'": '&#039;',
-	};
-
-	return text.replace(/[&<>"']/g, function (m) {
-		return map[m];
-	});
-}
-
 /* GET users listing. */
 router.get('/', function (req, res, next) {
 	try {
@@ -50,31 +36,17 @@ router.get('/', function (req, res) {
 	});
 	connection.connect();
 
-	let query = 'SELECT id,name,year,school,subject,difficulty,type,owner,promo FROM courses';
-	const filters = ['name', 'year', 'school', 'subject', 'difficulty', 'type'];
-	let params = [];
-	for (const [key, value] of Object.entries(req.query)) {
-		if (filters.includes(key)) {
-			if (params.length === 0) {
-				query += ' WHERE 1';
-			}
-			query += ` AND ${escapeHtml(key)}=?`;
-			params.push(escapeHtml(value));
+	connection.query(
+		'SELECT id,username,email,courses,confirmed,school,promo FROM users WHERE id=? AND username=? AND confirmed=?',
+		[req.user.id, req.user.username, req.user.confirmed],
+		(err, users) => {
+			if (users && users.length === 1) {
+				let user = users[0];
+				user.courses = JSON.parse(user.courses);
+				res.json(user);
+			} else res.json({ err });
 		}
-	}
-	if (req.query.order) {
-		if (req.query.order === 'asc') {
-			query += ' ORDER BY difficulty ASC';
-		} else if (req.query.order === 'desc') {
-			query += ' ORDER BY difficulty DESC';
-		}
-	}
-	console.log(query);
-
-	connection.query(query, params, (err, courses) => {
-		if (courses) res.json(courses);
-		else res.json({ err });
-	});
+	);
 	connection.end();
 });
 

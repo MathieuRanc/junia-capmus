@@ -68,8 +68,8 @@ router.post('/', async (req, res) => {
 
 		connection.connect();
 		connection.query(
-			"INSERT INTO users (username, email, password, roles, courses, confirmation_key) VALUES (?, ?, ?, '[\"ROLE_MEMBER\"]', '[]', ?);",
-			[req.body.username, req.body.email, password, confirmationKey],
+			"INSERT INTO users (username, email, password, roles, courses, confirmation_key, school) VALUES (?, ?, ?, '[\"ROLE_MEMBER\"]', '[]', ?, ?);",
+			[req.body.username, req.body.email, password, confirmationKey, req.body.school],
 			(err, result) => {
 				if (result) {
 					// Generate an access token

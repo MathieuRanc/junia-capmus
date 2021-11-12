@@ -4,10 +4,10 @@
 
 - [Technos](#technos)
 - [Description](#description)
-  - [Presentation](#presentation)
-  - [Features](#features)
-- [Upcoming Updates](#upcoming-updates)
-- [Changelog](#changelog)
+  - [Présentation](#présentation)
+  - [Fonctionnalités](#fonctionnalités)
+- [Mises à jours prévues](#mises-à-jours-prévues)
+- [Historique](#historique)
 
 # Technos
 

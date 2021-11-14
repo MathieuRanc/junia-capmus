@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <h1>Modifier le QCM</h1>
+    {{ QCM }}
     <h2>Description</h2>
     <table>
       <thead>
@@ -54,7 +55,7 @@
         </div>
         <div class="fields">
           <div class="question-field">
-            <label :for="'question' + i"> Question {{ i + 1 }} </label>
+            <label :for="'question' + i"> Question {{ question.id }} </label>
             <input
               v-model="question.question"
               type="text"
@@ -141,6 +142,7 @@
 
 <script>
 export default {
+  middleware: 'courses',
   data() {
     return {
       course: {},
@@ -154,12 +156,19 @@ export default {
       return this.lastQCM == JSON.stringify(this.QCM)
     },
   },
+  beforeMount() {
+    if (!this.$route.query.id) {
+      this.$router.push({
+        path: '/courses',
+      })
+    }
+  },
   async fetch() {
     const course = await this.$axios.$get('courses/' + this.$route.query.id)
     this.lastQCM = JSON.stringify(course.content)
     this.course = course
     this.QCM = course.content
-    this.currentId = Math.max(this.QCM.map((question) => question.id)) + 1
+    this.currentId = this.QCM.length
   },
   methods: {
     async save() {
@@ -345,7 +354,7 @@ input {
 .answers {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
   padding-top: 16px;
   .answer {

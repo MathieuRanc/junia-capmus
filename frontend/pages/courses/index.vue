@@ -1,18 +1,8 @@
 <template>
-  <div>
-    { "id": 1, "name": "Partiel", "year": 2021, "school": "ISEN", "subject":
-    "Cybersécurité", "difficulty": 4, "type": "QCM", "owner": 22 }
+  <div class="container">
+    <h1>Mes cours</h1>
     <ul>
-      <nuxt-link
-        v-for="course in courses"
-        :key="course.id"
-        :to="'courses/' + course.id"
-        tag="li"
-      >
-        {{
-          `${course.name} ${course.subject} ${course.year} ${course.difficulty} ${course.type}`
-        }}
-      </nuxt-link>
+      <CardCourse v-for="course in courses" :key="course.id" :course="course" />
     </ul>
   </div>
 </template>
@@ -22,12 +12,19 @@ import { mapState } from 'vuex'
 export default {
   computed: mapState({
     courses(state) {
-      return state.courses
-    },
-    subjects(state) {
-      return state.subjects
+      return state.courses.filter(
+        (course) => course.owner === this.$auth.user.id
+      )
     },
   }),
+  methods: {
+    score(course) {
+      const score = this.$auth.user.courses.find(
+        (userCourse) => userCourse && userCourse.id === course.id
+      )
+      return score ? score.id : 0
+    },
+  },
   async fetch() {
     const courses = await this.$axios.$get('courses')
     const subjects = await this.$axios.$get('subjects')
@@ -42,11 +39,7 @@ ul {
   list-style: none;
   padding: 0;
   display: grid;
-  padding: 40px;
-  gap: 10px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  li {
-    cursor: pointer;
-  }
+  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 </style>

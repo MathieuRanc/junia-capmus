@@ -61,4 +61,7 @@ button {
     color: #397ef6;
   }
 }
+.container {
+  padding: 40px;
+}
 </style>

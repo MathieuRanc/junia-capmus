@@ -29,9 +29,20 @@ textarea {
 body {
   margin: 0;
 }
+h1 {
+  font-weight: 900;
+  font-size: 40px;
+}
 a {
   text-decoration: none;
   color: #397ef6;
+}
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+  position: relative;
 }
 button {
   cursor: pointer;

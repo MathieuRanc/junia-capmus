@@ -57,4 +57,53 @@ router.put('/:id', function (req, res) {
 	connection.end();
 });
 
+router.patch('/:id', function (req, res, next) {
+	try {
+		if (!req.body.content) {
+			throw Error('Missing params');
+		}
+		const authHeader = req.headers.authorization;
+
+		if (authHeader) {
+			const token = authHeader.split(' ')[1];
+
+			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+				if (err || !JSON.parse(user.roles).includes('ROLE_MEMBER')) {
+					return res.status(403).send({ error: 'forbidden' });
+				} else {
+					req.user = user;
+					next();
+				}
+			});
+		} else {
+			res.status(401).send('undefined jwt token');
+		}
+	} catch (err) {
+		console.log('authenticated');
+		res.status(500).send({ error: err.message });
+	}
+});
+
+router.patch('/:id', function (req, res) {
+	var connection = mysql.createConnection({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USERNAME,
+		password: process.env.DB_PASSWORD,
+		database: process.env.DB_NAME,
+	});
+
+	connection.connect();
+	connection.query('UPDATE courses SET content=? WHERE id=? AND owner=?;', [JSON.stringify(req.body.content), req.params.id, req.user.id], (err) => {
+		if (err) res.json({ err });
+	});
+	connection.query('SELECT * FROM courses WHERE id=?', [req.params.id], (err, course) => {
+		if (course && course.length === 1) {
+			course = course[0];
+			course.content = JSON.parse(course.content);
+			res.json({ course });
+		} else res.json({ err });
+	});
+	connection.end();
+});
+
 module.exports = router;

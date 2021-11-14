@@ -41,7 +41,7 @@ router.get('/:id', function (req, res) {
 		if (course && course.length === 1) {
 			course = course[0];
 			course.content = JSON.parse(course.content);
-			res.json({ course });
+			res.json(course);
 		} else res.json({ err });
 	});
 	connection.end();

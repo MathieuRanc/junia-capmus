@@ -18,16 +18,16 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [],
+  css: ['pretty-checkbox/src/pretty-checkbox.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: ['~/plugins/checkbox'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
-  buildModules: ['@nuxtjs/dotenv'],
+  buildModules: ['@nuxtjs/dotenv', '@nuxtjs/fontawesome'],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
@@ -66,7 +66,10 @@ export default {
       },
     },
   },
-  // router: {
-  //   middleware: ['auth'],
-  // },
+
+  fontawesome: {
+    icons: {
+      solid: true,
+    },
+  },
 }

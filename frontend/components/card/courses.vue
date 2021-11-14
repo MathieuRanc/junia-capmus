@@ -16,9 +16,14 @@ export default {
   },
   computed: {
     score() {
-      return this.$auth.user.courses.find(
+      const course = this.$auth.user.courses.find(
         (course) => course.id === this.course.id
-      ).score
+      )
+      if (course) {
+        return course.score
+      } else {
+        return 0
+      }
     },
   },
 }

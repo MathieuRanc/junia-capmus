@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$auth.user">
+  <div v-if="$auth.user" class="container">
     {{ $auth.user }}
     <h1>Salut {{ $auth.user.username }} 👋</h1>
     <h2>Chaud pour réviser ?</h2>

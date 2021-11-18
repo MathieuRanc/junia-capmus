@@ -1,47 +1,55 @@
 <template>
-  <nuxt-link v-if="course" class="course" :to="'courses/' + course.id" tag="li">
-    <div class="score">
-      <doughnut-chart
-        class="chart"
-        :data="{
-          datasets: [
-            {
-              data: [score(course), 100 - score(course)],
-              backgroundColor: ['#6dc67b', '#deede4'],
-              hoverOffset: 4,
-            },
-          ],
-        }"
-        :options="chartOptions"
-      />
-      <div>{{ score(course) }}%</div>
-    </div>
-    <div class="description">
-      <h3>{{ course.subject }}</h3>
-      <div class="infos">
-        <div>
-          <font-awesome-icon icon="graduation-cap" />
-          <span>{{ course.type }}</span>
+  <div class="card" v-if="course">
+    <button class="favorite" @click="toggleFavorite()">
+      <font-awesome-icon v-if="favorite" class="red" icon="heart" />
+      <font-awesome-icon v-else :icon="['far', 'heart']" />
+    </button>
+
+    <nuxt-link class="course" :to="'courses/' + course.id" tag="li">
+      <div class="score">
+        <client-only>
+          <doughnut-chart
+            class="chart"
+            :data="{
+              datasets: [
+                {
+                  data: [score(course), 100 - score(course)],
+                  backgroundColor: ['#6dc67b', '#deede4'],
+                  hoverOffset: 4,
+                },
+              ],
+            }"
+          />
+        </client-only>
+        <div>{{ score(course) }}%</div>
+      </div>
+      <div class="description">
+        <h3>{{ course.subject }}</h3>
+        <div class="infos">
+          <div>
+            <font-awesome-icon icon="graduation-cap" />
+            <span>{{ course.type }}</span>
+          </div>
+          <div>
+            <font-awesome-icon icon="calendar-alt" />
+            <span>{{ course.year }}</span>
+          </div>
+          <div>
+            <font-awesome-icon icon="users" />
+            <span>{{ course.promo }}</span>
+          </div>
+          <div>
+            <font-awesome-icon icon="school" />
+            <span>{{ course.school }}</span>
+          </div>
         </div>
-        <div>
-          <font-awesome-icon icon="calendar-alt" />
-          <span>{{ course.year }}</span>
-        </div>
-        <div>
-          <font-awesome-icon icon="users" />
-          <span>{{ course.promo }}</span>
-        </div>
-        <div>
-          <font-awesome-icon icon="school" />
-          <span>{{ course.school }}</span>
+        <div class="bottom">
+          <button>&nbsp;</button>
+          <Difficulty :difficulty="course.difficulty" />
         </div>
       </div>
-      <div class="bottom">
-        <button>Ouvrir</button>
-        <Difficulty :difficulty="course.difficulty" />
-      </div>
-    </div>
-  </nuxt-link>
+    </nuxt-link>
+  </div>
 </template>
 
 <script>
@@ -49,38 +57,62 @@ import { mapState } from 'vuex'
 export default {
   props: {
     course: {
-      type: Array,
+      type: Object,
       default: null,
     },
   },
-  data() {
-    return {
-      chartOptions: {
-        cutoutPercentage: 80,
-        aspectRatio: 1,
-        responsive: true,
-        elements: {
-          arc: {
-            borderWidth: 0,
-          },
-        },
-        tooltips: { enabled: false },
-        hover: { mode: null },
-      },
-    }
+  computed: {
+    favorite() {
+      if (
+        this.$auth.user.courses.find(
+          (course) => course.id === this.course.id && course.favorite
+        )
+      ) {
+        return true
+      }
+      return false
+    },
   },
   methods: {
     score(course) {
-      const score = this.$auth.user.courses.find(
-        (userCourse) => userCourse && userCourse.id === course.id
-      )
-      return score ? score.id : 0
+      const score = this.$auth.user.courses.find((userCourse) => {
+        return userCourse.id === course.id
+      })
+      return score ? score.score : 0
+    },
+    toggleFavorite() {
+      let courses = JSON.parse(JSON.stringify(this.$auth.user.courses))
+      const index = courses.findIndex((course) => course.id === this.course.id)
+      if (index >= 0) courses[index].favorite = !courses[index].favorite
+      else courses.push({ id: this.course.id, score: 0, favorite: true })
+
+      this.$axios
+        .$patch(`me/${this.$auth.user.id}`, { courses })
+        .then(async (res) => {
+          this.$auth.$storage.setUniversal('user', res, true)
+        })
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.card {
+  position: relative;
+  .favorite {
+    position: absolute;
+    right: 20px;
+    top: 0px;
+    padding: 0;
+    background: none;
+    border-radius: 100px;
+    font-size: 30px;
+    color: black;
+    .red {
+      color: rgb(189, 50, 50);
+    }
+  }
+}
 ul {
   li {
     cursor: pointer;
@@ -88,7 +120,7 @@ ul {
 }
 .course {
   background-color: #f9f8fd;
-  box-shadow: 10px 10px 20px 2px rgba(149, 143, 174, 0.35);
+  // box-shadow: 10px 10px 20px 2px rgba(149, 143, 174, 0.35);
   border-radius: 10px;
 
   padding: 20px;
@@ -136,6 +168,7 @@ ul {
     flex-grow: 1;
     button {
       background-color: #6ac977;
+      background: none;
       border-radius: 4px;
       padding: 10px 36px;
       font-size: 18px;

@@ -93,9 +93,13 @@ router.patch('/:id', function (req, res) {
 	});
 
 	connection.connect();
-	connection.query('UPDATE courses SET content=? WHERE id=? AND owner=?;', [JSON.stringify(req.body.content), req.params.id, req.user.id], (err) => {
-		if (err) res.json({ err });
-	});
+
+	if (req.body.content) {
+		connection.query('UPDATE courses SET content=? WHERE id=? AND owner=?;', [JSON.stringify(req.body.content), req.params.id, req.user.id], (err) => {
+			if (err) res.json({ err });
+		});
+	}
+
 	connection.query('SELECT * FROM courses WHERE id=?', [req.params.id], (err, course) => {
 		if (course && course.length === 1) {
 			course = course[0];

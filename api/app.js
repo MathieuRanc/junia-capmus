@@ -17,6 +17,7 @@ var coursesCreateRouter = require('./routes/courses/create');
 var uploadRouter = require('./routes/uploads/create');
 var loginRouter = require('./routes/login');
 var meRouter = require('./routes/me');
+var meModifyRouter = require('./routes/me/_modify');
 var schoolsRouter = require('./routes/schools');
 var subjectsRouter = require('./routes/subjects');
 
@@ -46,6 +47,7 @@ app.use('/courses', coursesCreateRouter);
 app.use('/upload', uploadRouter);
 app.use('/login', loginRouter);
 app.use('/me', meRouter);
+app.use('/me', meModifyRouter);
 app.use('/schools', schoolsRouter);
 app.use('/subjects', subjectsRouter);
 

@@ -37,6 +37,7 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
+    '@nuxtjs/markdownit',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -73,6 +74,7 @@ export default {
   fontawesome: {
     icons: {
       solid: true,
+      regular: true,
     },
   },
 }

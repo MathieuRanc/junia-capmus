@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Modifier le QCM</h1>
+    <h1>Modifier les questions</h1>
     <h2>Description</h2>
     <table>
       <thead>
@@ -29,8 +29,12 @@
       <button class="cancel" @click="cancel">Annuler</button>
       <button @click="save">Sauvegarder</button>
     </div>
-    <transition-group name="list" class="questions">
-      <div v-for="(question, i) in QCM" :key="question.id" class="question">
+    <transition-group name="list" class="questions" tag="div">
+      <div
+        v-for="(question, i) in exercise"
+        :key="question.id"
+        class="question"
+      >
         <button class="del" @click="remove(i)" tabindex="-1">
           <font-awesome-icon icon="trash" />
         </button>
@@ -42,7 +46,7 @@
             <font-awesome-icon icon="chevron-up" />
           </button>
           <button
-            v-if="i < QCM.length - 1"
+            v-if="i < exercise.length - 1"
             @click="swap(i, i + 1)"
             tabindex="-1"
           >
@@ -54,84 +58,40 @@
         </div>
         <div class="fields">
           <div class="question-field">
-            <label :for="'question' + i"> Question {{ i + 1 }} </label>
-            <input
+            <label :for="'question' + i">Question {{ i + 1 }}</label>
+            <textarea
               v-model="question.question"
               type="text"
               name="question"
               :id="'question' + i"
-              @keyup.enter="focusAnswer(i)"
               autocomplete="off"
             />
           </div>
           <div class="answers">
-            <div
-              class="answer"
-              v-for="(answer, j) in question.answers"
-              :key="j"
-            >
-              <div class="check">
-                <p-check
-                  color="success"
-                  v-if="question.multiple"
-                  v-model="question.answers[j].correct"
-                  :name="'correct' + i"
-                  :id="`correct${i}-${j}`"
-                  :value="j"
-                  tabindex="-1"
-                />
-                <p-radio
-                  color="success"
-                  v-else
-                  v-model="question.correct"
-                  :name="'correct' + i"
-                  :id="`correct${i}-${j}`"
-                  :value="j"
-                  tabindex="-1"
-                />
-              </div>
-              <input
-                :class="correctQuestionClass(question, j)"
-                v-model="question.answers[j].text"
-                type="text"
-                name="answer"
-                :id="`answer${i}-${j}`"
-                :ref="`answer${i}-${j}`"
-                @keyup.enter="addAnswer(question, i, j)"
-                @keyup.delete="deleteAnswer(question, i, j)"
-                autocomplete="off"
-              />
-            </div>
+            <label :for="'answer' + i">Réponse</label>
+            <textarea
+              v-model="question.answer"
+              type="text"
+              name="answer"
+              :id="'answer' + i"
+              :ref="'answer' + i"
+              autocomplete="off"
+            />
           </div>
         </div>
       </div>
     </transition-group>
     <div class="add">
       <font-awesome-icon
-        icon="plus-square"
-        @click="
-          QCM.push({
-            id: nextId(),
-            active: true,
-            question: '',
-            multiple: true,
-            answers: [
-              { text: null, correct: true },
-              { text: null, correct: false },
-            ],
-          })
-        "
-      />
-      <font-awesome-icon
         icon="plus-circle"
         @click="
-          QCM.push({
+          exercise.push({
             id: nextId(),
+            tips: '',
             active: true,
+            answer: '',
             question: '',
-            multiple: false,
-            answers: [{ text: null }, { text: null }],
-            correct: 0,
+            explanation: '',
           })
         "
       />
@@ -145,14 +105,14 @@ export default {
   data() {
     return {
       course: {},
-      QCM: [],
-      lastQCM: [],
+      exercise: [],
+      lastExercise: [],
       currentId: 0,
     }
   },
   computed: {
     saved() {
-      return this.lastQCM == JSON.stringify(this.QCM)
+      return this.lastExercise == JSON.stringify(this.exercise)
     },
   },
   beforeMount() {
@@ -164,24 +124,24 @@ export default {
   },
   async fetch() {
     const course = await this.$axios.$get('courses/' + this.$route.query.id)
-    this.lastQCM = JSON.stringify(course.content)
+    this.lastExercise = JSON.stringify(course.content)
     this.course = course
-    this.QCM = course.content
-    this.currentId = this.QCM.length
+    this.exercise = course.content
+    this.currentId = this.exercise.length + 1
   },
   methods: {
     async save() {
       await this.$axios.$patch('courses/' + this.$route.query.id, {
-        content: this.QCM,
+        content: this.exercise,
       })
-      this.lastQCM = JSON.stringify(this.QCM)
+      this.lastExercise = JSON.stringify(this.exercise)
     },
     nextId() {
       this.currentId += 1
       return this.currentId - 1
     },
     cancel() {
-      this.QCM = JSON.parse(this.lastQCM)
+      this.exercise = JSON.parse(this.lastExercise)
     },
     correctQuestionClass(question, index) {
       if (question.multiple) {
@@ -193,14 +153,14 @@ export default {
       }
     },
     remove(i) {
-      this.QCM.splice(i, 1)
+      this.exercise.splice(i, 1)
     },
     swap(x, y) {
-      let rows = [this.QCM[x], this.QCM[y]]
-      this.QCM.splice(Math.min(x, y), 2, rows[1], rows[0])
+      let rows = [this.exercise[x], this.exercise[y]]
+      this.exercise.splice(Math.min(x, y), 2, rows[1], rows[0])
     },
     focusAnswer(i) {
-      let input = this.$refs[`answer${i}-0`]
+      let input = this.$refs['answer' + i]
       if (input) input[0].focus()
     },
     addAnswer(el, i, j) {
@@ -233,17 +193,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+textarea {
+  resize: vertical;
+}
 .question {
-  transition: all 500ms;
+  transition: all 300ms;
   display: inline-block;
   position: relative;
-  max-height: 320px;
+  // position: absolute;
+  // max-height: 1000px;
   margin-bottom: 40px;
 }
 .list-enter,
 .list-leave-to {
   opacity: 0;
-  max-height: 0;
+  // max-height: 0;
+  // position: absolute;
   margin-bottom: 0;
 }
 .container {
@@ -287,10 +252,6 @@ table {
       color: rgb(158, 158, 158);
     }
   }
-}
-.questions {
-  display: flex;
-  flex-direction: column;
 }
 .question {
   background: #fbfbfb;
@@ -339,7 +300,8 @@ table {
       flex-direction: column;
       width: 100%;
     }
-    input {
+    input,
+    textarea {
       padding: 16px 24px;
       background-color: #ffffff;
       border: 1px solid #b4b4b9;
@@ -347,24 +309,20 @@ table {
     }
   }
 }
-input {
+input,
+textarea {
   outline-color: rgb(158, 158, 158);
 }
 .answers {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(1, minmax(0, 1fr));
 
   padding-top: 16px;
   .answer {
     display: flex;
-    input[type='checkbox'],
-    input[type='radio'] {
-      &:checked::before {
-        background-color: green;
-      }
-    }
-    input[type='text'] {
+    input[type='text'],
+    textarea {
       transition: all 200ms;
       flex-grow: 1;
       &.green {

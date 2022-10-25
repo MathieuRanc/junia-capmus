@@ -2,7 +2,7 @@
   <div v-if="$auth.user" class="container">
     <h1>Salut {{ $auth.user.username }} 👋</h1>
     <h2>Chaud pour réviser ?</h2>
-    <GalleryCourses title="Favorits" :courses="favoritesCourses" />
+    <GalleryCourses title="Favorit" :courses="favoritesCourses" />
     <GalleryCourses title="Mes sujets" :courses="suggestedCourses" />
     <GalleryCourses title="Autres sujets" :courses="otherCourses" />
   </div>
